@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Profile</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(45deg, #0f2027, #203a43, #2c5364);
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            text-align: center;
+            color: #fff;
+        }
+        .avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 0 auto;
+            border: 3px solid #00d4ff;
+        }
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .name {
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .buttons {
+            margin-top: 30px;
+        }
+        .button {
+            display: inline-block;
+            width: 150px;
+            padding: 10px;
+            margin: 10px;
+            background-color: #00d4ff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: #0098b8;
+        }
+        #codeDisplay {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #00ff85;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="avatar">
+            <img src="https://via.placeholder.com/150" alt="Avatar">
+        </div>
+        <div class="name">Your Name</div>
+        <div class="buttons">
+            <a href="#" id="linkvertiseBtn" class="button">Linkvertise</a>
+            <a href="#" class="button">Button 2</a>
+            <a href="#" class="button">Button 3</a>
+        </div>
+        <div id="codeDisplay"></div>
+    </div>
+
+    <script>
+        // Thay thế bằng link Linkvertise của bạn
+        const linkvertiseURL = "https://linkvertise.com/your-link-here?return_to=https://your-website.com/index.html";
+
+        // Gắn sự kiện cho nút Linkvertise
+        document.getElementById("linkvertiseBtn").addEventListener("click", function(e) {
+            e.preventDefault();
+            window.location.href = linkvertiseURL;
+        });
+
+        // Kiểm tra truy cập khi trang được tải
+        window.onload = function() {
+            const referrer = document.referrer;
+            const codeDisplay = document.getElementById("codeDisplay");
+
+            // Kiểm tra nếu truy cập từ Linkvertise
+            if (referrer.includes("linkvertise.com")) {
+                // Tạo mã code ngẫu nhiên
+                const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+                codeDisplay.style.display = "block";
+                codeDisplay.textContent = `Your Code: ${randomCode}`;
+            } else if (referrer !== "") {
+                // Nếu truy cập từ nguồn khác không phải Linkvertise
+                codeDisplay.style.display = "block";
+                codeDisplay.textContent = "Access Denied: Invalid Source";
+            }
+        };
+    </script>
+</body>
+</html>
