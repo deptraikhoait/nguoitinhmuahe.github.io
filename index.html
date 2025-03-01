@@ -68,7 +68,7 @@
 <body>
     <div class="container">
         <div class="avatar">
-            <img src="https://via.placeholder.com/150" alt="Avatar">
+            <img src="https://cdn.discordapp.com/attachments/1327807265616564266/1345324007007846421/ZeroDay_Haven.png?ex=67c4221e&is=67c2d09e&hm=48140fd82e09cb64e93959e6600276c2b1fa5601a098c2edb907b36fbcf50d49&" alt="Avatar">
         </div>
         <div class="name">Your Name</div>
         <div class="buttons">
@@ -80,28 +80,29 @@
     </div>
 
     <script>
-        // Thay bằng link GitHub Pages của bạn
-        const baseURL = "https://username.github.io/my-tech-page/";
-        const linkvertiseBase = "https://linkvertise.com/your-link-here";
+        // URL GitHub Pages của bạn
+        const baseURL = "https://deptraikhoait.github.io/nguoitinhmuahe.github.io/";
+        // Linkvertise test của bạn
+        const linkvertiseBase = "https://linkvertise.com/1308163/link-test-anti-bypass?o=sharing";
 
-        // Tạo token ngẫu nhiên
-        function generateToken() {
-            return Math.random().toString(36).substring(2, 10).toUpperCase();
+        // Tạo hash ngẫu nhiên
+        function generateHash() {
+            return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         }
 
-        // Lưu token vào localStorage với thời hạn ngắn (ví dụ: 5 phút)
-        function saveToken(token) {
+        // Lưu hash vào localStorage với thời hạn
+        function saveHash(hash) {
             const expiration = Date.now() + 5 * 60 * 1000; // 5 phút
-            localStorage.setItem("accessToken", JSON.stringify({ token, expiration }));
+            localStorage.setItem("accessHash", JSON.stringify({ hash, expiration }));
         }
 
-        // Kiểm tra token hợp lệ
-        function verifyToken(token) {
-            const stored = localStorage.getItem("accessToken");
+        // Kiểm tra hash hợp lệ
+        function verifyHash(hash) {
+            const stored = localStorage.getItem("accessHash");
             if (!stored) return false;
-            const { token: savedToken, expiration } = JSON.parse(stored);
-            if (savedToken === token && Date.now() < expiration) {
-                localStorage.removeItem("accessToken"); // Xóa token sau khi dùng
+            const { hash: savedHash, expiration } = JSON.parse(stored);
+            if (savedHash === hash && Date.now() < expiration) {
+                localStorage.removeItem("accessHash"); // Xóa hash sau khi dùng
                 return true;
             }
             return false;
@@ -110,27 +111,27 @@
         // Gắn sự kiện cho nút Linkvertise
         document.getElementById("linkvertiseBtn").addEventListener("click", function(e) {
             e.preventDefault();
-            const token = generateToken();
-            saveToken(token);
-            const returnURL = `${baseURL}?token=${token}`;
-            window.location.href = `${linkvertiseBase}?return_to=${encodeURIComponent(returnURL)}`;
+            const hash = generateHash();
+            saveHash(hash);
+            const returnURL = `${baseURL}?hash=${hash}`;
+            window.location.href = `${linkvertiseBase}&return_to=${encodeURIComponent(returnURL)}`;
         });
 
         // Kiểm tra khi trang tải
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
-            const token = urlParams.get("token");
+            const hash = urlParams.get("hash");
             const codeDisplay = document.getElementById("codeDisplay");
 
-            if (token && verifyToken(token)) {
-                // Token hợp lệ, hiển thị mã code
+            if (hash && verifyHash(hash)) {
+                // Hash hợp lệ, hiển thị mã code
                 const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
                 codeDisplay.style.display = "block";
                 codeDisplay.textContent = `Your Code: ${randomCode}`;
             } else {
-                // Token không hợp lệ hoặc không có
+                // Hash không hợp lệ hoặc không có
                 codeDisplay.style.display = "block";
-                codeDisplay.textContent = "Access Denied: Invalid or Expired Token";
+                codeDisplay.textContent = "Access Denied: Invalid or Expired Hash";
             }
         };
     </script>
