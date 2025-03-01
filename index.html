@@ -68,42 +68,69 @@
 <body>
     <div class="container">
         <div class="avatar">
-            <img src="https://cdn.discordapp.com/attachments/1327807265616564266/1345324007007846421/ZeroDay_Haven.png?ex=67c4221e&is=67c2d09e&hm=48140fd82e09cb64e93959e6600276c2b1fa5601a098c2edb907b36fbcf50d49&" alt="Avatar">
+            <img src="https://via.placeholder.com/150" alt="Avatar">
         </div>
-        <div class="name">ZeroDay Haven</div>
+        <div class="name">Your Name</div>
         <div class="buttons">
             <a href="#" id="linkvertiseBtn" class="button">Linkvertise</a>
-            <a href="#" class="button">chưa test</a>
-            <a href="#" class="button">chưa test</a>
+            <a href="#" class="button">Button 2</a>
+            <a href="#" class="button">Button 3</a>
         </div>
         <div id="codeDisplay"></div>
     </div>
 
     <script>
-        // Thay thế bằng link Linkvertise của bạn
-        const linkvertiseURL = "https://link-center.net/1308163/link-test-anti-bypass";
+        // Thay bằng link GitHub Pages của bạn
+        const baseURL = "https://username.github.io/my-tech-page/";
+        const linkvertiseBase = "https://linkvertise.com/your-link-here";
+
+        // Tạo token ngẫu nhiên
+        function generateToken() {
+            return Math.random().toString(36).substring(2, 10).toUpperCase();
+        }
+
+        // Lưu token vào localStorage với thời hạn ngắn (ví dụ: 5 phút)
+        function saveToken(token) {
+            const expiration = Date.now() + 5 * 60 * 1000; // 5 phút
+            localStorage.setItem("accessToken", JSON.stringify({ token, expiration }));
+        }
+
+        // Kiểm tra token hợp lệ
+        function verifyToken(token) {
+            const stored = localStorage.getItem("accessToken");
+            if (!stored) return false;
+            const { token: savedToken, expiration } = JSON.parse(stored);
+            if (savedToken === token && Date.now() < expiration) {
+                localStorage.removeItem("accessToken"); // Xóa token sau khi dùng
+                return true;
+            }
+            return false;
+        }
 
         // Gắn sự kiện cho nút Linkvertise
         document.getElementById("linkvertiseBtn").addEventListener("click", function(e) {
             e.preventDefault();
-            window.location.href = linkvertiseURL;
+            const token = generateToken();
+            saveToken(token);
+            const returnURL = `${baseURL}?token=${token}`;
+            window.location.href = `${linkvertiseBase}?return_to=${encodeURIComponent(returnURL)}`;
         });
 
-        // Kiểm tra truy cập khi trang được tải
+        // Kiểm tra khi trang tải
         window.onload = function() {
-            const referrer = document.referrer;
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get("token");
             const codeDisplay = document.getElementById("codeDisplay");
 
-            // Kiểm tra nếu truy cập từ Linkvertise
-            if (referrer.includes("linkvertise.com")) {
-                // Tạo mã code ngẫu nhiên
+            if (token && verifyToken(token)) {
+                // Token hợp lệ, hiển thị mã code
                 const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
                 codeDisplay.style.display = "block";
                 codeDisplay.textContent = `Your Code: ${randomCode}`;
-            } else if (referrer !== "") {
-                // Nếu truy cập từ nguồn khác không phải Linkvertise
+            } else {
+                // Token không hợp lệ hoặc không có
                 codeDisplay.style.display = "block";
-                codeDisplay.textContent = "Access Denied: địt mẹ mày bypass hả nhóc ?";
+                codeDisplay.textContent = "Access Denied: Invalid or Expired Token";
             }
         };
     </script>
