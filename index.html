@@ -83,57 +83,49 @@
         const baseURL = "https://deptraikhoait.github.io/nguoitinhmuahe.github.io/";
         const linkvertiseBase = "https://linkvertise.com/1308163/link-test-anti-bypass";
 
-        function generateHash() {
-            return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-        }
-
-        function saveHash(hash) {
-            const expiration = Date.now() + 5 * 60 * 1000; // 5 phút
-            localStorage.setItem("accessHash", JSON.stringify({ hash, expiration }));
-        }
-
-        function verifyHash(hash) {
-            const stored = localStorage.getItem("accessHash");
-            if (!stored) return false;
-            const { hash: savedHash, expiration } = JSON.parse(stored);
-            if (savedHash === hash && Date.now() < expiration) {
-                localStorage.removeItem("accessHash");
-                return true;
-            }
-            return false;
+        // Tạo mã xác nhận đơn giản
+        function generateVerifier() {
+            return Math.random().toString(36).substring(2, 10).toUpperCase();
         }
 
         document.getElementById("linkvertiseBtn").addEventListener("click", function(e) {
             e.preventDefault();
-            const hash = generateHash();
-            saveHash(hash);
-            const returnURL = `${baseURL}?hash=${hash}`;
+            const verifier = generateVerifier();
+            // Lưu verifier để kiểm tra sau
+            sessionStorage.setItem("linkVerifier", verifier);
+            const returnURL = `${baseURL}?verifier=${verifier}`;
             const url = new URL(linkvertiseBase);
             url.searchParams.set("o", "sharing");
             url.searchParams.set("return_to", returnURL);
+            console.log("Redirecting to:", url.toString()); // Debug
             window.location.href = url.toString();
         });
 
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
-            const hash = urlParams.get("hash");
+            const verifier = urlParams.get("verifier");
             const referrer = document.referrer;
             const codeDisplay = document.getElementById("codeDisplay");
+            const storedVerifier = sessionStorage.getItem("linkVerifier");
 
-            // Nếu có referrer từ Linkvertise và không cần hash (cho premium)
-            if (referrer.includes("linkvertise.com") && !hash) {
-                const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-                codeDisplay.style.display = "block";
-                codeDisplay.textContent = `Your Code: ${randomCode} (Premium Access)`;
-            }
-            // Kiểm tra hash cho người dùng không premium
-            else if (hash && verifyHash(hash)) {
+            console.log("Referrer:", referrer); // Debug
+            console.log("Verifier from URL:", verifier); // Debug
+            console.log("Stored Verifier:", storedVerifier); // Debug
+
+            // Kiểm tra truy cập hợp lệ
+            if (verifier && storedVerifier === verifier && referrer.includes("linkvertise.com")) {
+                sessionStorage.removeItem("linkVerifier"); // Xóa sau khi dùng
                 const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
                 codeDisplay.style.display = "block";
                 codeDisplay.textContent = `Your Code: ${randomCode}`;
+            } else if (referrer.includes("linkvertise.com")) {
+                // Trường hợp premium: không cần verifier, chỉ cần referrer
+                const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+                codeDisplay.style.display = "block";
+                codeDisplay.textContent = `Your Code: ${randomCode} (Premium Access)`;
             } else {
                 codeDisplay.style.display = "block";
-                codeDisplay.textContent = "Access Denied: Invalid or Expired Hash";
+                codeDisplay.textContent = "Access Denied: aaa Access";
             }
         };
     </script>
