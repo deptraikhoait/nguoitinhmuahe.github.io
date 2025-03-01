@@ -127,10 +127,15 @@
             return Math.random().toString(36).substring(2, 10).toUpperCase();
         }
 
+        function generateCode() {
+            return Math.random().toString(36).substring(2, 8).toUpperCase();
+        }
+
         document.getElementById("linkvertiseBtn").addEventListener("click", function(e) {
             e.preventDefault();
             const verifier = generateVerifier();
             sessionStorage.setItem("linkVerifier", verifier);
+            sessionStorage.removeItem("generatedCode"); // Xóa code cũ khi nhấn lại nút
             const returnURL = `${baseURL}?verifier=${verifier}`;
             const url = new URL(linkvertiseBase);
             url.searchParams.set("o", "sharing");
@@ -145,18 +150,27 @@
             const referrer = document.referrer;
             const codeDisplay = document.getElementById("codeDisplay");
             const storedVerifier = sessionStorage.getItem("linkVerifier");
+            const storedCode = sessionStorage.getItem("generatedCode");
 
             console.log("Referrer:", referrer);
             console.log("Verifier from URL:", verifier);
             console.log("Stored Verifier:", storedVerifier);
 
-            if (verifier && storedVerifier === verifier && referrer.includes("linkvertise.com")) {
+            // Nếu đã có mã code cũ, hiển thị lại
+            if (storedCode) {
+                codeDisplay.style.display = "block";
+                codeDisplay.textContent = storedCode;
+            }
+            // Kiểm tra truy cập từ Linkvertise
+            else if (verifier && storedVerifier === verifier && referrer.includes("linkvertise.com")) {
                 sessionStorage.removeItem("linkVerifier");
-                const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+                const randomCode = generateCode();
+                sessionStorage.setItem("generatedCode", `Your Code: ${randomCode}`);
                 codeDisplay.style.display = "block";
                 codeDisplay.textContent = `Your Code: ${randomCode}`;
             } else if (referrer.includes("linkvertise.com")) {
-                const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+                const randomCode = generateCode();
+                sessionStorage.setItem("generatedCode", `Your Code: ${randomCode} (Premium Access)`);
                 codeDisplay.style.display = "block";
                 codeDisplay.textContent = `Your Code: ${randomCode} (Premium Access)`;
             } else {
