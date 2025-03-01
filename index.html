@@ -80,61 +80,58 @@
     </div>
 
     <script>
-        // URL GitHub Pages của bạn
         const baseURL = "https://deptraikhoait.github.io/nguoitinhmuahe.github.io/";
-        // Linkvertise test của bạn
         const linkvertiseBase = "https://linkvertise.com/1308163/link-test-anti-bypass";
 
-        // Tạo hash ngẫu nhiên
         function generateHash() {
             return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         }
 
-        // Lưu hash vào localStorage với thời hạn
         function saveHash(hash) {
             const expiration = Date.now() + 5 * 60 * 1000; // 5 phút
             localStorage.setItem("accessHash", JSON.stringify({ hash, expiration }));
         }
 
-        // Kiểm tra hash hợp lệ
         function verifyHash(hash) {
             const stored = localStorage.getItem("accessHash");
             if (!stored) return false;
             const { hash: savedHash, expiration } = JSON.parse(stored);
             if (savedHash === hash && Date.now() < expiration) {
-                localStorage.removeItem("accessHash"); // Xóa hash sau khi dùng
+                localStorage.removeItem("accessHash");
                 return true;
             }
             return false;
         }
 
-        // Gắn sự kiện cho nút Linkvertise
         document.getElementById("linkvertiseBtn").addEventListener("click", function(e) {
             e.preventDefault();
             const hash = generateHash();
             saveHash(hash);
             const returnURL = `${baseURL}?hash=${hash}`;
-            
-            // Tạo URL Linkvertise với tham số đúng cách
             const url = new URL(linkvertiseBase);
             url.searchParams.set("o", "sharing");
             url.searchParams.set("return_to", returnURL);
             window.location.href = url.toString();
         });
 
-        // Kiểm tra khi trang tải
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const hash = urlParams.get("hash");
+            const referrer = document.referrer;
             const codeDisplay = document.getElementById("codeDisplay");
 
-            if (hash && verifyHash(hash)) {
-                // Hash hợp lệ, hiển thị mã code
+            // Nếu có referrer từ Linkvertise và không cần hash (cho premium)
+            if (referrer.includes("linkvertise.com") && !hash) {
+                const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+                codeDisplay.style.display = "block";
+                codeDisplay.textContent = `Your Code: ${randomCode} (Premium Access)`;
+            }
+            // Kiểm tra hash cho người dùng không premium
+            else if (hash && verifyHash(hash)) {
                 const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
                 codeDisplay.style.display = "block";
                 codeDisplay.textContent = `Your Code: ${randomCode}`;
             } else {
-                // Hash không hợp lệ hoặc không có
                 codeDisplay.style.display = "block";
                 codeDisplay.textContent = "Access Denied: Invalid or Expired Hash";
             }
