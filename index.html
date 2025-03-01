@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tech Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
@@ -12,20 +13,40 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background: linear-gradient(45deg, #0f2027, #203a43, #2c5364);
-            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            font-family: 'Orbitron', sans-serif;
+            overflow: hidden;
         }
         .container {
             text-align: center;
             color: #fff;
+            position: relative;
+            z-index: 1;
+        }
+        .background-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, rgba(0, 0, 0, 0) 70%);
+            z-index: 0;
+            animation: pulse 10s infinite;
         }
         .avatar {
-            width: 150px;
-            height: 150px;
+            width: 180px;
+            height: 180px;
             border-radius: 50%;
             overflow: hidden;
             margin: 0 auto;
-            border: 3px solid #00d4ff;
+            border: 4px solid #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: float 3s ease-in-out infinite;
+        }
+        .avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.8);
         }
         .avatar img {
             width: 100%;
@@ -33,39 +54,58 @@
             object-fit: cover;
         }
         .name {
-            margin-top: 20px;
-            font-size: 24px;
-            font-weight: bold;
+            margin-top: 25px;
+            font-size: 28px;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
         }
         .buttons {
-            margin-top: 30px;
+            margin-top: 40px;
         }
         .button {
             display: inline-block;
-            width: 150px;
-            padding: 10px;
+            width: 160px;
+            padding: 12px;
             margin: 10px;
-            background-color: #00d4ff;
+            background: linear-gradient(45deg, #00d4ff, #0098b8);
             color: #fff;
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 16px;
-            transition: background-color 0.3s;
+            font-weight: 400;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .button:hover {
-            background-color: #0098b8;
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.7);
         }
         #codeDisplay {
-            margin-top: 20px;
-            font-size: 18px;
+            margin-top: 30px;
+            font-size: 20px;
             color: #00ff85;
+            text-shadow: 0 0 5px rgba(0, 255, 133, 0.7);
             display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
 <body>
+    <div class="background-effect"></div>
     <div class="container">
         <div class="avatar">
             <img src="https://cdn.discordapp.com/attachments/1327807265616564266/1345324007007846421/ZeroDay_Haven.png?ex=67c4221e&is=67c2d09e&hm=48140fd82e09cb64e93959e6600276c2b1fa5601a098c2edb907b36fbcf50d49&" alt="Avatar">
@@ -83,7 +123,6 @@
         const baseURL = "https://deptraikhoait.github.io/nguoitinhmuahe.github.io/";
         const linkvertiseBase = "https://linkvertise.com/1308163/link-test-anti-bypass";
 
-        // Tạo mã xác nhận đơn giản
         function generateVerifier() {
             return Math.random().toString(36).substring(2, 10).toUpperCase();
         }
@@ -91,13 +130,12 @@
         document.getElementById("linkvertiseBtn").addEventListener("click", function(e) {
             e.preventDefault();
             const verifier = generateVerifier();
-            // Lưu verifier để kiểm tra sau
             sessionStorage.setItem("linkVerifier", verifier);
             const returnURL = `${baseURL}?verifier=${verifier}`;
             const url = new URL(linkvertiseBase);
             url.searchParams.set("o", "sharing");
             url.searchParams.set("return_to", returnURL);
-            console.log("Redirecting to:", url.toString()); // Debug
+            console.log("Redirecting to:", url.toString());
             window.location.href = url.toString();
         });
 
@@ -108,24 +146,22 @@
             const codeDisplay = document.getElementById("codeDisplay");
             const storedVerifier = sessionStorage.getItem("linkVerifier");
 
-            console.log("Referrer:", referrer); // Debug
-            console.log("Verifier from URL:", verifier); // Debug
-            console.log("Stored Verifier:", storedVerifier); // Debug
+            console.log("Referrer:", referrer);
+            console.log("Verifier from URL:", verifier);
+            console.log("Stored Verifier:", storedVerifier);
 
-            // Kiểm tra truy cập hợp lệ
             if (verifier && storedVerifier === verifier && referrer.includes("linkvertise.com")) {
-                sessionStorage.removeItem("linkVerifier"); // Xóa sau khi dùng
+                sessionStorage.removeItem("linkVerifier");
                 const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
                 codeDisplay.style.display = "block";
                 codeDisplay.textContent = `Your Code: ${randomCode}`;
             } else if (referrer.includes("linkvertise.com")) {
-                // Trường hợp premium: không cần verifier, chỉ cần referrer
                 const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
                 codeDisplay.style.display = "block";
                 codeDisplay.textContent = `Your Code: ${randomCode} (Premium Access)`;
             } else {
                 codeDisplay.style.display = "block";
-                codeDisplay.textContent = "Access Denied: aaa Access";
+                codeDisplay.textContent = "Access Denied: Invalid Access";
             }
         };
     </script>
