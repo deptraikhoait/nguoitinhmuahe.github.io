@@ -83,7 +83,7 @@
         // URL GitHub Pages của bạn
         const baseURL = "https://deptraikhoait.github.io/nguoitinhmuahe.github.io/";
         // Linkvertise test của bạn
-        const linkvertiseBase = "https://link-center.net/1308163/link-test-anti-bypass";
+        const linkvertiseBase = "https://linkvertise.com/1308163/link-test-anti-bypass";
 
         // Tạo hash ngẫu nhiên
         function generateHash() {
@@ -114,7 +114,12 @@
             const hash = generateHash();
             saveHash(hash);
             const returnURL = `${baseURL}?hash=${hash}`;
-            window.location.href = `${linkvertiseBase}&return_to=${encodeURIComponent(returnURL)}`;
+            
+            // Tạo URL Linkvertise với tham số đúng cách
+            const url = new URL(linkvertiseBase);
+            url.searchParams.set("o", "sharing");
+            url.searchParams.set("return_to", returnURL);
+            window.location.href = url.toString();
         });
 
         // Kiểm tra khi trang tải
