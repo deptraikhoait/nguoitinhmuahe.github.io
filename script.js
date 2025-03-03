@@ -13,7 +13,6 @@
     document.getElementById("linkvertiseBtn").addEventListener("click", function(e) {
         e.preventDefault();
         const verifier = generateVerifier();
-        sessionStorage.setItem("linkVerifier", verifier);
         const returnURL = `${BASE_URL}?verifier=${verifier}`;
         const url = new URL(LINKVERTISE_URL);
         url.searchParams.set("o", "sharing");
@@ -26,13 +25,8 @@
         const verifier = params.get("verifier");
         const referrer = document.referrer;
         const display = document.getElementById("codeDisplay");
-        const storedVerifier = sessionStorage.getItem("linkVerifier");
 
-        // Kiểm tra verifier hợp lệ (có timestamp và random)
-        const verifierParts = verifier ? verifier.split('-') : [];
-        const isValidVerifier = verifier && storedVerifier === verifier && verifierParts.length === 2;
-
-        if (isValidVerifier) {
+        if (verifier) {  // Chỉ cần verifier tồn tại
             display.style.display = "block";
             display.textContent = "Đang lấy code, vui lòng chờ...";
 
