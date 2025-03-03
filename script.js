@@ -24,23 +24,29 @@ function generateVerifier() {
         console.log("Step 2: window.onload triggered");
         const urlParams = new URLSearchParams(window.location.search);
         const verifier = urlParams.get("verifier");
+        const hash = urlParams.get("hash");
         const referrer = document.referrer;
         const currentURL = window.location.href;
         const codeDisplay = document.getElementById("codeDisplay");
 
         console.log("Step 3: Verifier từ URL:", verifier);
-        console.log("Step 4: Referrer:", referrer);
-        console.log("Step 5: URL hiện tại:", currentURL);
+        console.log("Step 4: Hash từ URL:", hash);
+        console.log("Step 5: Referrer:", referrer);
+        console.log("Step 6: URL hiện tại:", currentURL);
 
         codeDisplay.style.display = "block";
 
-        if (!verifier) {
-            codeDisplay.textContent = "Access Denied: Verifier không tồn tại trong URL!";
-            console.log("Step 6: Verifier không tồn tại!");
+        // Nếu không có verifier hoặc hash, báo lỗi
+        if (!verifier && !hash) {
+            codeDisplay.textContent = "Access Denied: Không có Verifier hoặc Hash trong URL!";
+            console.log("Step 7: Không có Verifier hoặc Hash!");
             return;
         }
 
-        console.log("Step 7: Verifier tồn tại, gửi request đến bot...");
+        // Dùng verifier nếu có, nếu không thì dùng hash
+        const token = verifier || hash;
+
+        console.log("Step 8: Token gửi đến bot:", token);
         codeDisplay.textContent = "Đang lấy code, vui lòng chờ...";
 
         try {
@@ -50,27 +56,27 @@ function generateVerifier() {
                     'Content-Type': 'application/json',
                     'X-Secret-Key': SECRET_KEY
                 },
-                body: JSON.stringify({ verifier, referrer, currentURL })
+                body: JSON.stringify({ token, referrer, currentURL })
             });
-            console.log("Step 8: Đã gửi request, chờ phản hồi...");
+            console.log("Step 9: Đã gửi request, chờ phản hồi...");
 
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
 
             const data = await response.json();
-            console.log("Step 9: Response từ bot:", data);
+            console.log("Step 10: Response từ bot:", data);
 
             if (data.code) {
                 codeDisplay.textContent = `Code của bạn: ${data.code}\nDùng lệnh "?redeem ${data.code}" hoặc "/redeem ${data.code}" trong Discord để nhận role!\nCode sẽ hết hạn sau 5 phút.\nHiện có ${data.key_count} key đang hoạt động.`;
-                console.log("Step 10: Nhận key thành công!");
+                console.log("Step 11: Nhận key thành công!");
             } else {
                 codeDisplay.textContent = `Lỗi từ bot: ${data.error}`;
-                console.log("Step 11: Bot trả về lỗi!");
+                console.log("Step 12: Bot trả về lỗi!");
             }
         } catch (error) {
             codeDisplay.textContent = "Lỗi kết nối bot, kiểm tra host hoặc IP!";
-            console.error("Step 12: Fetch error:", error);
+            console.error("Step 13: Fetch error:", error);
         }
     };
 })();
