@@ -36,20 +36,18 @@ function generateVerifier() {
 
         codeDisplay.style.display = "block";
 
-        // Nếu không có verifier hoặc hash, báo lỗi
-        if (!verifier && !hash) {
+        const token = verifier || hash;
+        if (!token) {
             codeDisplay.textContent = "Access Denied: Không có Verifier hoặc Hash trong URL!";
             console.log("Step 7: Không có Verifier hoặc Hash!");
             return;
         }
 
-        // Dùng verifier nếu có, nếu không thì dùng hash
-        const token = verifier || hash;
-
         console.log("Step 8: Token gửi đến bot:", token);
         codeDisplay.textContent = "Đang lấy code, vui lòng chờ...";
 
         try {
+            console.log("Step 9: Gửi request đến bot...");
             const response = await fetch(`${BOT_HOST}/getkey`, {
                 method: 'POST',
                 headers: {
@@ -58,25 +56,25 @@ function generateVerifier() {
                 },
                 body: JSON.stringify({ token, referrer, currentURL })
             });
-            console.log("Step 9: Đã gửi request, chờ phản hồi...");
+            console.log("Step 10: Request gửi thành công, chờ phản hồi...");
 
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
 
             const data = await response.json();
-            console.log("Step 10: Response từ bot:", data);
+            console.log("Step 11: Response từ bot:", data);
 
             if (data.code) {
                 codeDisplay.textContent = `Code của bạn: ${data.code}\nDùng lệnh "?redeem ${data.code}" hoặc "/redeem ${data.code}" trong Discord để nhận role!\nCode sẽ hết hạn sau 5 phút.\nHiện có ${data.key_count} key đang hoạt động.`;
-                console.log("Step 11: Nhận key thành công!");
+                console.log("Step 12: Nhận key thành công!");
             } else {
                 codeDisplay.textContent = `Lỗi từ bot: ${data.error}`;
-                console.log("Step 12: Bot trả về lỗi!");
+                console.log("Step 13: Bot trả về lỗi!");
             }
         } catch (error) {
             codeDisplay.textContent = "Lỗi kết nối bot, kiểm tra host hoặc IP!";
-            console.error("Step 13: Fetch error:", error);
+            console.error("Step 14: Fetch error:", error);
         }
     };
 })();
