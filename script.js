@@ -12,44 +12,35 @@ function generateVerifier() {
     document.getElementById("linkvertiseBtn").addEventListener("click", function(e) {
         e.preventDefault();
         const verifier = generateVerifier();
-        localStorage.setItem("tempVerifier", verifier);
         const returnURL = `${BASE_URL}?verifier=${verifier}`;
         const url = new URL(LINKVERTISE_URL);
         url.searchParams.set("o", "sharing");
         url.searchParams.set("return_to", returnURL);
-        console.log("Redirecting to:", url.toString());
+        console.log("Step 1: Redirecting to:", url.toString());
         window.location.href = url.toString();
     });
 
     window.onload = async function() {
+        console.log("Step 2: window.onload triggered");
         const urlParams = new URLSearchParams(window.location.search);
         const verifier = urlParams.get("verifier");
         const referrer = document.referrer;
+        const currentURL = window.location.href;
         const codeDisplay = document.getElementById("codeDisplay");
-        const storedVerifier = localStorage.getItem("tempVerifier");
 
-        console.log("Step 1: Bắt đầu onload");
-        console.log("Step 2: Verifier từ URL:", verifier);
-        console.log("Step 3: Stored Verifier từ localStorage:", storedVerifier);
+        console.log("Step 3: Verifier từ URL:", verifier);
         console.log("Step 4: Referrer:", referrer);
-        console.log("Step 5: URL hiện tại:", window.location.href);
+        console.log("Step 5: URL hiện tại:", currentURL);
 
         codeDisplay.style.display = "block";
 
-        if (!storedVerifier || storedVerifier !== verifier) {
-            codeDisplay.textContent = "Access Denied: Verifier không hợp lệ hoặc không tồn tại!";
-            console.log("Step 6: Verifier không khớp hoặc không tồn tại!");
+        if (!verifier) {
+            codeDisplay.textContent = "Access Denied: Verifier không tồn tại trong URL!";
+            console.log("Step 6: Verifier không tồn tại!");
             return;
         }
 
-        console.log("Step 7: Verifier hợp lệ, kiểm tra referrer...");
-        if (referrer && !referrer.includes("linkvertise.com")) {
-            codeDisplay.textContent = "Access Denied: Nguồn không hợp lệ!";
-            console.log("Step 8: Referrer không từ Linkvertise!");
-            return;
-        }
-
-        console.log("Step 9: Đang gửi request đến bot...");
+        console.log("Step 7: Verifier tồn tại, gửi request đến bot...");
         codeDisplay.textContent = "Đang lấy code, vui lòng chờ...";
 
         try {
@@ -59,24 +50,27 @@ function generateVerifier() {
                     'Content-Type': 'application/json',
                     'X-Secret-Key': SECRET_KEY
                 },
-                body: JSON.stringify({ verifier, referrer })
+                body: JSON.stringify({ verifier, referrer, currentURL })
             });
-            console.log("Step 10: Đã gửi request, chờ phản hồi...");
-            
+            console.log("Step 8: Đã gửi request, chờ phản hồi...");
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
             const data = await response.json();
-            console.log("Step 11: Response từ bot:", data);
+            console.log("Step 9: Response từ bot:", data);
 
             if (data.code) {
-                localStorage.removeItem("tempVerifier");
                 codeDisplay.textContent = `Code của bạn: ${data.code}\nDùng lệnh "?redeem ${data.code}" hoặc "/redeem ${data.code}" trong Discord để nhận role!\nCode sẽ hết hạn sau 5 phút.\nHiện có ${data.key_count} key đang hoạt động.`;
-                console.log("Step 12: Nhận key thành công!");
+                console.log("Step 10: Nhận key thành công!");
             } else {
                 codeDisplay.textContent = `Lỗi từ bot: ${data.error}`;
-                console.log("Step 13: Bot trả về lỗi!");
+                console.log("Step 11: Bot trả về lỗi!");
             }
         } catch (error) {
             codeDisplay.textContent = "Lỗi kết nối bot, kiểm tra host hoặc IP!";
-            console.error("Step 14: Fetch error:", error);
+            console.error("Step 12: Fetch error:", error);
         }
     };
 })();
