@@ -1,8 +1,8 @@
 (function() {
     const BASE_URL = "https://deptraikhoait.github.io/nguoitinhmuahe.github.io/";
     const LINKVERTISE_URL = "https://linkvertise.com/1308163/link-test-anti-bypass";
-    const BOT_HOST = "http://YOUR_HOST_IP:5000"; // Thay bằng IP host
-    const SECRET_KEY = "jkhncjkzxnbvjkxncjkvnbcxjkboiaeuwt984376oifjsdvklnxjklcvnbuireygoicdhvklsndjklvguifdgbudoihv"; // Thay bằng key bí mật
+    const BOT_HOST = "http://14.228.97.135:5000"; // Thay bằng IP host
+    const SECRET_KEY = "jhcxbvburehgguiswwdhgfygsduvggre876yt985uishvuifdhg78934yuigfshdviu"; // Thay bằng key bí mật
 
     document.getElementById("linkvertiseBtn").addEventListener("click", function(e) {
         e.preventDefault();
