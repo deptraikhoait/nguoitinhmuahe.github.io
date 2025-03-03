@@ -2,7 +2,7 @@
     const BASE_URL = "https://deptraikhoait.github.io/nguoitinhmuahe.github.io/";
     const LINKVERTISE_URL = "https://linkvertise.com/1308163/link-test-anti-bypass";
     const BOT_HOST = "http://14.228.97.135:5000"; // Thay bằng IP host
-    const SECRET_KEY = "jhcxbvburehgguiswwdhgfygsduvggre876yt985uishvuifdhg78934yuigfshdviu"; // Thay bằng key bí mật
+    const SECRET_KEY = "jhcxbvburehgguiswwdhgfygsduvggre876yt985uishvuifdhg78934yuigfshdviu#t89y34578y&*"; // Thay bằng key bí mật
 function generateVerifier() {
         const timestamp = Date.now().toString(36).toUpperCase();
         const random = Math.random().toString(36).substring(2, 8).toUpperCase();
