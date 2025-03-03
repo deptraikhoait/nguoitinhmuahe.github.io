@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Key</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            font-family: 'Orbitron', sans-serif;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            color: #fff;
+            position: relative;
+            z-index: 1;
+        }
+        .background-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, rgba(0, 0, 0, 0) 70%);
+            z-index: 0;
+            animation: pulse 10s infinite;
+        }
+        #codeDisplay {
+            margin-top: 30px;
+            font-size: 20px;
+            color: #00ff85;
+            text-shadow: 0 0 5px rgba(0, 255, 133, 0.7);
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-effect"></div>
+    <div class="container">
+        <div id="codeDisplay"></div>
+    </div>
+    <script>
+        const BOT_HOST = "http://YOUR_PUBLIC_IP:5000"; // Thay bằng IP bot
+        const SECRET_KEY = "YOUR_SECRET_API_KEY"; // Thay bằng key bí mật
+
+        window.onload = async function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const verifier = urlParams.get("verifier");
+            const referrer = document.referrer;
+            const codeDisplay = document.getElementById("codeDisplay");
+            const storedVerifier = localStorage.getItem("tempVerifier");
+
+            console.log("Verifier từ URL:", verifier);
+            console.log("Stored Verifier từ localStorage:", storedVerifier);
+            console.log("Referrer:", referrer);
+            console.log("URL hiện tại:", window.location.href);
+
+            if (!storedVerifier || storedVerifier !== verifier) {
+                codeDisplay.textContent = "Access Denied: Verifier không hợp lệ hoặc không tồn tại!";
+                console.log("Verifier không khớp hoặc không tồn tại!");
+                return;
+            }
+
+            if (referrer && !referrer.includes("linkvertise.com")) {
+                codeDisplay.textContent = "Access Denied: Nguồn không hợp lệ!";
+                console.log("Referrer không từ Linkvertise!");
+                return;
+            }
+
+            codeDisplay.textContent = "Đang lấy code, vui lòng chờ...";
+
+            try {
+                const response = await fetch(`${BOT_HOST}/getkey`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Secret-Key': SECRET_KEY
+                    },
+                    body: JSON.stringify({ verifier, referrer })
+                });
+                const data = await response.json();
+                console.log("Response từ bot:", data);
+
+                if (data.code) {
+                    localStorage.removeItem("tempVerifier");
+                    codeDisplay.textContent = `Code của bạn: ${data.code}\nDùng lệnh "?redeem ${data.code}" hoặc "/redeem ${data.code}" trong Discord để nhận role!\nCode sẽ hết hạn sau 5 phút.\nHiện có ${data.key_count} key đang hoạt động.`;
+                } else {
+                    codeDisplay.textContent = `Lỗi từ bot: ${data.error}`;
+                }
+            } catch (error) {
+                codeDisplay.textContent = "Lỗi kết nối bot, kiểm tra host!";
+                console.error("Fetch error:", error);
+            }
+        };
+    </script>
+</body>
+</html>
