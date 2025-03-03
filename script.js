@@ -3,7 +3,7 @@
     const LINKVERTISE_URL = "https://linkvertise.com/1308163/link-test-anti-bypass";
     const BOT_HOST = "http://14.228.97.135:5000"; // Thay bằng IP host
     const SECRET_KEY = "jhcxbvburehgguiswwdhgfygsduvggre876yt985uishvuifdhg78934yuigfshdviu"; // Thay bằng key bí mật
-// Hàm sinh verifier với timestamp
+// Sinh verifier với timestamp để chống bypass
     function generateVerifier() {
         const timestamp = Date.now().toString(36).toUpperCase();
         const random = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -17,18 +17,24 @@
         const url = new URL(LINKVERTISE_URL);
         url.searchParams.set("o", "sharing");
         url.searchParams.set("return_to", returnURL);
+        console.log("Redirecting to:", url.toString());
         window.location.href = url.toString();
     });
 
     window.onload = async function() {
-        const params = new URLSearchParams(window.location.search);
-        const verifier = params.get("verifier");
+        const urlParams = new URLSearchParams(window.location.search);
+        const verifier = urlParams.get("verifier");
         const referrer = document.referrer;
-        const display = document.getElementById("codeDisplay");
+        const codeDisplay = document.getElementById("codeDisplay");
 
-        if (verifier) {  // Chỉ cần verifier tồn tại
-            display.style.display = "block";
-            display.textContent = "Đang lấy code, vui lòng chờ...";
+        // Debug thông tin
+        console.log("Verifier từ URL:", verifier);
+        console.log("Referrer:", referrer);
+        console.log("URL hiện tại:", window.location.href);
+
+        if (verifier) { // Chỉ cần verifier tồn tại
+            codeDisplay.style.display = "block";
+            codeDisplay.textContent = "Đang lấy code, vui lòng chờ...";
 
             try {
                 const response = await fetch(`${BOT_HOST}/getkey`, {
@@ -40,18 +46,20 @@
                     body: JSON.stringify({ verifier, referrer })
                 });
                 const data = await response.json();
+                console.log("Response từ bot:", data);
+
                 if (data.code) {
-                    display.textContent = `Code của bạn: ${data.code}\nDùng lệnh "?redeem ${data.code}" hoặc "/redeem ${data.code}" trong Discord để nhận role!\nCode sẽ hết hạn sau 5 phút.\nHiện có ${data.key_count} key đang hoạt động.`;
+                    codeDisplay.textContent = `Code của bạn: ${data.code}\nDùng lệnh "?redeem ${data.code}" hoặc "/redeem ${data.code}" trong Discord để nhận role!\nCode sẽ hết hạn sau 5 phút.\nHiện có ${data.key_count} key đang hoạt động.`;
                 } else {
-                    display.textContent = `Lỗi: ${data.error}`;
+                    codeDisplay.textContent = `Lỗi: ${data.error}`;
                 }
             } catch (error) {
-                display.textContent = "Lỗi hệ thống, vui lòng thử lại!";
-                console.error(error);
+                codeDisplay.textContent = "Lỗi hệ thống, vui lòng thử lại!";
+                console.error("Fetch error:", error);
             }
         } else {
-            display.style.display = "block";
-            display.textContent = "Access Denied: Invalid Access";
+            codeDisplay.style.display = "block";
+            codeDisplay.textContent = "Access Denied: Invalid Access - Verifier không tồn tại!";
         }
     };
 })();
