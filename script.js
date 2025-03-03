@@ -3,10 +3,16 @@
     const LINKVERTISE_URL = "https://linkvertise.com/1308163/link-test-anti-bypass";
     const BOT_HOST = "http://14.228.97.135:5000"; // Thay bằng IP host
     const SECRET_KEY = "jhcxbvburehgguiswwdhgfygsduvggre876yt985uishvuifdhg78934yuigfshdviu"; // Thay bằng key bí mật
+// Hàm sinh verifier với timestamp
+    function generateVerifier() {
+        const timestamp = Date.now().toString(36).toUpperCase();
+        const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+        return `${timestamp}-${random}`; // Ví dụ: "1H7K9P2-X7K9P2"
+    }
 
     document.getElementById("linkvertiseBtn").addEventListener("click", function(e) {
         e.preventDefault();
-        const verifier = Math.random().toString(36).substring(2, 10).toUpperCase();
+        const verifier = generateVerifier();
         sessionStorage.setItem("linkVerifier", verifier);
         const returnURL = `${BASE_URL}?verifier=${verifier}`;
         const url = new URL(LINKVERTISE_URL);
@@ -22,7 +28,11 @@
         const display = document.getElementById("codeDisplay");
         const storedVerifier = sessionStorage.getItem("linkVerifier");
 
-        if (verifier && storedVerifier === verifier && referrer.includes("linkvertise.com")) {
+        // Kiểm tra verifier hợp lệ (có timestamp và random)
+        const verifierParts = verifier ? verifier.split('-') : [];
+        const isValidVerifier = verifier && storedVerifier === verifier && verifierParts.length === 2;
+
+        if (isValidVerifier) {
             display.style.display = "block";
             display.textContent = "Đang lấy code, vui lòng chờ...";
 
