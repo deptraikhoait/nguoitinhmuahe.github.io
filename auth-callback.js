@@ -4,8 +4,8 @@ exports.handler = async function(event, context) {
     const { code } = event.queryStringParameters;
 
     const params = new URLSearchParams();
-    params.append('client_id', 'YOUR_CLIENT_ID');
-    params.append('client_secret', 'YOUR_CLIENT_SECRET');
+    params.append('client_id', '1348052521498968135');
+    params.append('client_secret', 'vwIWMK_uG8_xL9cWc5Zd21o9JqwviS9k');
     params.append('code', code);
     params.append('redirect_uri', 'https://clever-crepe-28ec8d.netlify.app/');
     params.append('grant_type', 'authorization_code');
